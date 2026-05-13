@@ -4,62 +4,80 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NursingApp — Enfermagem</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
       --bg: #ffffff;
-      --bg-sec: #f5f5f0;
-      --bg-ter: #eeede8;
-      --text: #1a1a18;
-      --text-sec: #6b6b67;
-      --border: rgba(0,0,0,0.12);
-      --border-sec: rgba(0,0,0,0.2);
-      --radius-md: 8px;
-      --radius-lg: 12px;
+      --bg-sec: #f3f3f3;
+      --text: #1a1a1a;
       --green: #1D9E75;
-      --green-light: #E1F5EE;
     }
 
     body {
-      font-family: Arial, sans-serif;
-      background: var(--bg-ter);
-      color: var(--text);
-      padding: 1rem;
+      font-family: Arial;
+      background: var(--bg-sec);
+      padding: 15px;
     }
 
     .app {
-      max-width: 700px;
+      max-width: 720px;
       margin: auto;
-      background: var(--bg);
+      background: white;
       padding: 20px;
       border-radius: 12px;
     }
 
-    .tab { padding: 8px 12px; cursor: pointer; }
-    .tab.active { border-bottom: 2px solid var(--green); }
+    h2 { margin-bottom: 10px; }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .tab {
+      padding: 8px 12px;
+      border: none;
+      cursor: pointer;
+      background: #eee;
+      border-radius: 8px;
+    }
+
+    .tab.active {
+      background: var(--green);
+      color: white;
+    }
 
     .section { display: none; }
     .section.active { display: block; }
 
     .quiz-opt {
       display: block;
+      width: 100%;
       margin: 6px 0;
       padding: 10px;
+      border-radius: 8px;
       border: 1px solid #ccc;
       cursor: pointer;
-      border-radius: 6px;
+      background: white;
     }
 
-    .quiz-opt.correct { background: #c8f7c5; }
-    .quiz-opt.wrong { background: #f7c5c5; }
+    .correct { background: #c8f7c5 !important; }
+    .wrong { background: #f7c5c5 !important; }
 
-    .btn {
+    button.next {
       margin-top: 10px;
       padding: 8px 12px;
       cursor: pointer;
+    }
+
+    input {
+      display: block;
+      margin: 6px 0;
+      padding: 8px;
+      width: 100%;
     }
   </style>
 </head>
@@ -67,12 +85,11 @@
 <body>
 
 <div class="app">
-
   <h2>NursingApp</h2>
 
-  <div>
+  <div class="tabs">
     <button class="tab active" onclick="show('quiz', this)">Quiz</button>
-    <button class="tab" onclick="show('calc', this)">Calculadora</button>
+    <button class="tab" onclick="show('calc', this)">IMC</button>
     <button class="tab" onclick="show('proc', this)">Procedimentos</button>
   </div>
 
@@ -81,45 +98,41 @@
     <h3 id="qtitle"></h3>
     <div id="qopts"></div>
     <p id="qexp"></p>
-    <button class="btn" onclick="next()">Próxima</button>
+
+    <button class="next" onclick="next()">Próxima</button>
     <p>Pontos: <span id="score">0</span></p>
   </div>
 
-  <!-- CALC -->
+  <!-- IMC -->
   <div id="calc" class="section">
-    <h3>IMC</h3>
-    <input id="peso" placeholder="Peso" oninput="imc()">
-    <input id="alt" placeholder="Altura" oninput="imc()">
+    <h3>Calculadora IMC</h3>
+    <input id="peso" placeholder="Peso (kg)" oninput="imc()">
+    <input id="alt" placeholder="Altura (m)" oninput="imc()">
     <p id="res"></p>
   </div>
 
   <!-- PROC -->
   <div id="proc" class="section">
     <h3>Procedimentos</h3>
-    <p>Conteúdo mantido do seu original</p>
+    <p>Conteúdo mantido do seu sistema.</p>
   </div>
-
 </div>
 
 <script>
 
 const questions = [
-  {q:"Antídoto benzodiazepínico?", o:["Naloxona","Flumazenil","Atropina","Adrenalina"], a:1, e:"Flumazenil bloqueia benzodiazepínicos."},
+  {q:"Antídoto benzodiazepínico?", o:["Naloxona","Flumazenil","Atropina","Adrenalina"], a:1, e:"Flumazenil reverte benzodiazepínicos."},
   {q:"Via mais rápida?", o:["IM","SC","VO","IV"], a:3, e:"IV é imediata."},
   {q:"Bradicardia usa?", o:["Atropina","AAS","Insulina","Morfina"], a:0, e:"Atropina aumenta FC."},
   {q:"Diafragma nervo?", o:["Vago","Frênico","Ulnar","Femoral"], a:1, e:"Frênico C3-C5."},
-  {q:"SA nodo fica?", o:["VE","VD","AD","AE"], a:2, e:"Átrio direito."},
+  {q:"Nó SA fica?", o:["VE","VD","AD","AE"], a:2, e:"Átrio direito."},
   {q:"SpO2 baixa?", o:["<95","<90","<80","<70"], a:1, e:"<90 hipoxemia."},
   {q:"Glasgow avalia?", o:["Dor","Consciência","Reflexo","Pulso"], a:1, e:"Consciência."},
   {q:"Choque posição?", o:["Fowler","Trendelenburg","Sentado","Lateral"], a:1, e:"Trendelenburg."},
   {q:"Valva esquerda?", o:["Tricúspide","Mitral","Pulmonar","Aórtica"], a:1, e:"Mitral."},
-  {q:"Insulina regular início?", o:["30-60min","5min","2h","12h"], a:0, e:"30-60min."},
-
-  // + QUESTÕES EXTRAS
-  {q:"PA ideal adulto?", o:["120/80","200/100","90/60","140/100"], a:0, e:"120/80 normal."},
-  {q:"Febre acima de?", o:["36","37","38","39"], a:2, e:"38°C."},
-  {q:"Pulso normal?", o:["30","60-100","150","200"], a:1, e:"60-100 bpm."},
-  {q:"Oxigênio baixo tratamento?", o:["Água","O2","AAS","Insulina"], a:1, e:"Oxigenoterapia."},
+  {q:"Insulina regular início?", o:["30-60min","5min","2h","12h"], a:0, e:"30–60 min."},
+  {q:"PA normal?", o:["120/80","200/100","90/60","140/100"], a:0, e:"Normal 120/80."},
+  {q:"Febre é acima de?", o:["36","37","38","39"], a:2, e:"38°C."},
 ];
 
 let i = 0;
@@ -128,6 +141,7 @@ let locked = false;
 
 function load(){
   locked = false;
+
   const q = questions[i];
   document.getElementById("qtitle").innerText = q.q;
 
@@ -178,12 +192,14 @@ function show(id, el){
   el.classList.add("active");
 }
 
-// IMC simples
+// IMC
 function imc(){
   let p = parseFloat(document.getElementById("peso").value);
   let a = parseFloat(document.getElementById("alt").value);
+
   if(!p || !a) return;
-  let r = p/(a*a);
+
+  let r = p / (a * a);
   document.getElementById("res").innerText = "IMC: " + r.toFixed(1);
 }
 
