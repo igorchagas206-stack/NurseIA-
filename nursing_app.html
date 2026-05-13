@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NursingApp — Enfermagem</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg-sec: #f5f5f0;
+      --bg-ter: #eeede8;
+      --text: #1a1a18;
+      --text-sec: #6b6b67;
+      --border: rgba(0,0,0,0.12);
+      --border-sec: rgba(0,0,0,0.2);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --green: #1D9E75;
+      --green-light: #E1F5EE;
+      --green-dark: #085041;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1e1e1c;
+        --bg-sec: #272725;
+        --bg-ter: #2e2e2b;
+        --text: #f0efe9;
+        --text-sec: #9a9990;
+        --border: rgba(255,255,255,0.1);
+        --border-sec: rgba(255,255,255,0.2);
+        --green-light: #04342C;
+        --green-dark: #9FE1CB;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-ter);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .app {
+      max-width: 680px;
+      margin: 0 auto;
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem 2rem;
+      border: 0.5px solid var(--border);
+    }
+
+    /* HEADER */
+    .header { display: flex; align-items: center; gap: 10px; margin-bottom: 0; }
+    .logo { width: 38px; height: 38px; background: var(--green); border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .logo i { font-size: 20px; color: #fff; }
+    .header-text p:first-child { font-size: 16px; font-weight: 500; color: var(--text); }
+    .header-text p:last-child { font-size: 12px; color: var(--text-sec); }
+
+    /* TABS */
+    .tabs { display: flex; gap: 4px; padding: 1rem 0 0; border-bottom: 0.5px solid var(--border); margin-bottom: 1.5rem; }
+    .tab { padding: 8px 16px; font-size: 13px; border: none; background: none; color: var(--text-sec); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; border-radius: 0; display: flex; align-items: center; gap: 6px; }
+    .tab.active { color: var(--text); font-weight: 500; border-bottom-color: var(--green); }
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* QUIZ */
+    .quiz-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1rem; }
+    .quiz-progress { font-size: 12px; color: var(--text-sec); margin-bottom: 0.75rem; }
+    .quiz-q { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 1.25rem; line-height: 1.5; }
+    .quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+    .quiz-opt { padding: 10px 14px; border: 0.5px solid var(--border-sec); border-radius: var(--radius-md); cursor: pointer; font-size: 14px; color: var(--text); background: var(--bg); text-align: left; transition: background 0.15s; }
+    .quiz-opt:hover { background: var(--bg-sec); }
+    .quiz-opt.correct { background: #EAF3DE; border-color: #3B6D11; color: #173404; }
+    .quiz-opt.wrong { background: #FCEBEB; border-color: #A32D2D; color: #501313; }
+    .quiz-feedback { margin-top: 1rem; padding: 10px 14px; border-radius: var(--radius-md); font-size: 13px; line-height: 1.5; display: none; }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.ok { background: #EAF3DE; color: #27500A; }
+    .quiz-feedback.err { background: #FCEBEB; color: #791F1F; }
+    .quiz-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
+    .score-badge { font-size: 13px; background: var(--bg-sec); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 4px 12px; color: var(--text-sec); }
+    .btn { padding: 8px 16px; border: 0.5px solid var(--border-sec); border-radius: var(--radius-md); background: var(--bg); color: var(--text); font-size: 13px; cursor: pointer; }
+    .btn:hover { background: var(--bg-sec); }
+    .cat-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.25rem; }
+    .cat-btn { padding: 6px 14px; border: 0.5px solid var(--border-sec); border-radius: 999px; font-size: 12px; cursor: pointer; background: var(--bg); color: var(--text-sec); }
+    .cat-btn.active { background: var(--green); color: #fff; border-color: var(--green); }
+
+    /* CALC */
+    .calc-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+    .calc-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+    .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
+    .calc-field label { font-size: 12px; color: var(--text-sec); display: block; margin-bottom: 4px; }
+    .calc-field input, .calc-field select {
+      width: 100%; padding: 8px 10px;
+      border: 0.5px solid var(--border-sec);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+    }
+    .calc-field input:focus, .calc-field select:focus { border-color: var(--green); }
+    .calc-result { background: var(--green-light); border-radius: var(--radius-md); padding: 12px 16px; font-size: 22px; font-weight: 500; color: var(--green); text-align: center; margin-top: 8px; }
+    .calc-result span { font-size: 13px; font-weight: 400; display: block; color: var(--green); margin-top: 2px; opacity: 0.8; }
+    .calc-tabs { display: flex; gap: 6px; margin-bottom: 1rem; }
+    .calc-tab { padding: 6px 12px; border: 0.5px solid var(--border-sec); border-radius: var(--radius-md); font-size: 12px; cursor: pointer; background: var(--bg); color: var(--text-sec); }
+    .calc-tab.active { background: var(--bg-sec); color: var(--text); font-weight: 500; }
+
+    /* GUIA */
+    .proc-list { display: flex; flex-direction: column; gap: 8px; }
+    .proc-item { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+    .proc-header { padding: 12px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 500; color: var(--text); }
+    .proc-header:hover { background: var(--bg-sec); }
+    .proc-body { display: none; padding: 12px 16px; border-top: 0.5px solid var(--border); }
+    .proc-body.open { display: block; }
+    .proc-step { display: flex; gap: 12px; margin-bottom: 10px; font-size: 13px; color: var(--text); align-items: flex-start; }
+    .step-num { min-width: 22px; height: 22px; background: var(--green); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; flex-shrink: 0; margin-top: 1px; }
+    .proc-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px; margin-right: 6px; margin-bottom: 6px; }
+    .tag-urgente { background: #FCEBEB; color: #791F1F; }
+    .tag-basico { background: #EAF3DE; color: #27500A; }
+    .tag-tecnico { background: #E6F1FB; color: #0C447C; }
+    .search-bar {
+      width: 100%; padding: 9px 14px;
+      border: 0.5px solid var(--border-sec);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      background: var(--bg);
+      color: var(--text);
+      margin-bottom: 1rem;
+      outline: none;
+    }
+    .search-bar:focus { border-color: var(--green); }
+
+    @media (max-width: 480px) {
+      body { padding: 0; }
+      .app { border-radius: 0; border: none; min-height: 100vh; }
+      .calc-grid { grid-template-columns: 1fr; }
+      .tabs { overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="logo"><i class="ti ti-heart-plus"></i></div>
+    <div class="header-text">
+      <p>NursingApp</p>
+      <p>Estude com eficiência</p>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showSection('quiz', this)"><i class="ti ti-brain"></i> Quiz</button>
+    <button class="tab" onclick="showSection('calc', this)"><i class="ti ti-calculator"></i> Calculadoras</button>
+    <button class="tab" onclick="showSection('guia', this)"><i class="ti ti-list-check"></i> Procedimentos</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz" class="section active">
+    <div class="cat-selector" id="cats"></div>
+    <div class="quiz-card">
+      <div class="quiz-progress" id="qprog"></div>
+      <div class="quiz-q" id="qtext"></div>
+      <div class="quiz-opts" id="qopts"></div>
+      <div class="quiz-feedback" id="qfeed"></div>
+      <div class="quiz-nav">
+        <div class="score-badge" id="qscore">Pontuação: 0</div>
+        <button class="btn" id="qnext" style="display:none;" onclick="nextQ()">Próxima →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALCULADORAS -->
+  <div id="calc" class="section">
+    <div class="calc-tabs">
+      <button class="calc-tab active" onclick="showCalc('dose', this)">Dose por peso</button>
+      <button class="calc-tab" onclick="showCalc('gotejo', this)">Gotejamento</button>
+      <button class="calc-tab" onclick="showCalc('imc', this)">IMC</button>
+    </div>
+
+    <div class="calc-card" id="calc-dose">
+      <div class="calc-title"><i class="ti ti-pill"></i> Cálculo de dose por peso</div>
+      <div class="calc-grid">
+        <div class="calc-field"><label>Dose prescrita (mg/kg)</label><input type="number" id="dose_mk" placeholder="ex: 10" oninput="calcDose()"></div>
+        <div class="calc-field"><label>Peso do paciente (kg)</label><input type="number" id="dose_peso" placeholder="ex: 70" oninput="calcDose()"></div>
+        <div class="calc-field"><label>Concentração (mg/mL)</label><input type="number" id="dose_conc" placeholder="ex: 5" oninput="calcDose()"></div>
+        <div class="calc-field"><label>Via de administração</label>
+          <select id="dose_via"><option>IV</option><option>IM</option><option>VO</option></select>
+        </div>
+      </div>
+      <div class="calc-result" id="dose_res">— <span>Preencha os campos acima</span></div>
+    </div>
+
+    <div class="calc-card" id="calc-gotejo" style="display:none;">
+      <div class="calc-title"><i class="ti ti-droplet"></i> Cálculo de gotejamento</div>
+      <div class="calc-grid">
+        <div class="calc-field"><label>Volume (mL)</label><input type="number" id="got_vol" placeholder="ex: 500" oninput="calcGotejo()"></div>
+        <div class="calc-field"><label>Tempo (horas)</label><input type="number" id="got_tempo" placeholder="ex: 6" oninput="calcGotejo()"></div>
+        <div class="calc-field"><label>Equipo</label>
+          <select id="got_eq" onchange="calcGotejo()">
+            <option value="20">Macro (20 gts/mL)</option>
+            <option value="60">Micro (60 gts/mL)</option>
+          </select>
+        </div>
+        <div class="calc-field"><label>&nbsp;</label>
+          <div style="font-size:12px; color:var(--text-sec); padding-top:20px;">Fórmula: V × fator ÷ T(min)</div>
+        </div>
+      </div>
+      <div class="calc-result" id="got_res">— <span>Preencha os campos acima</span></div>
+    </div>
+
+    <div class="calc-card" id="calc-imc" style="display:none;">
+      <div class="calc-title"><i class="ti ti-scale"></i> Índice de Massa Corporal</div>
+      <div class="calc-grid">
+        <div class="calc-field"><label>Peso (kg)</label><input type="number" id="imc_peso" placeholder="ex: 70" oninput="calcIMC()"></div>
+        <div class="calc-field"><label>Altura (m)</label><input type="number" id="imc_alt" placeholder="ex: 1.70" step="0.01" oninput="calcIMC()"></div>
+      </div>
+      <div class="calc-result" id="imc_res">— <span>Preencha os campos acima</span></div>
+    </div>
+  </div>
+
+  <!-- PROCEDIMENTOS -->
+  <div id="guia" class="section">
+    <input class="search-bar" type="text" placeholder="Buscar procedimento..." id="search" oninput="filterProcs()">
+    <div class="proc-list" id="proclist"></div>
+  </div>
+</div>
+
+<script>
+const questions = [
+  { cat:"Farmacologia", q:"Qual o antídoto específico para intoxicação por benzodiazepínicos?", opts:["Naloxona","Flumazenil","Atropina","N-acetilcisteína"], ans:1, exp:"O Flumazenil é antagonista competitivo dos receptores benzodiazepínicos no SNC, revertendo sedação e depressão respiratória." },
+  { cat:"Farmacologia", q:"A via de administração que oferece absorção mais rápida é:", opts:["Oral","Subcutânea","Intravenosa","Intramuscular"], ans:2, exp:"A via IV é a mais rápida pois o medicamento é inserido diretamente na corrente sanguínea, sem etapa de absorção." },
+  { cat:"Farmacologia", q:"Qual medicamento é utilizado no tratamento de bradicardia sintomática?", opts:["Lidocaína","Amiodarona","Atropina","Adenosina"], ans:2, exp:"A Atropina bloqueia o vago, aumentando a frequência cardíaca. É a primeira linha nas bradicardias sintomáticas." },
+  { cat:"Anatomia", q:"O nervo responsável pela sensibilidade do diafragma é:", opts:["Vago","Frênico","Intercostal","Hipoglosso"], ans:1, exp:"O nervo frênico (C3-C5) inerva o diafragma motor e sensorialmente. 'C3, C4, C5 keep the diaphragm alive'." },
+  { cat:"Anatomia", q:"O nó sinoatrial está localizado:", opts:["Ventrículo esquerdo","Átrio esquerdo","Átrio direito","Septo interventricular"], ans:2, exp:"O nó SA fica na parede do átrio direito, próximo à desembocadura da veia cava superior. É o marca-passo natural do coração." },
+  { cat:"Clínica", q:"Saturação de O₂ menor que qual valor indica hipoxemia em adultos?", opts:["95%","90%","85%","80%"], ans:1, exp:"Saturação < 90% caracteriza hipoxemia. Entre 90-94% é considerada limítrofe; acima de 95% é adequada para a maioria dos pacientes." },
+  { cat:"Clínica", q:"A escala de Glasgow avalia:", opts:["Dor, temperatura e reflexos","Abertura ocular, resposta verbal e motora","Frequência cardíaca, pressão e Glasgow","Consciência e reflexos pupilares"], ans:1, exp:"ECG: Abertura Ocular (1-4) + Resposta Verbal (1-5) + Resposta Motora (1-6). Mínimo 3, máximo 15." },
+  { cat:"Clínica", q:"A posição adequada para paciente com suspeita de choque hipovolêmico é:", opts:["Decúbito lateral","Fowler alta","Trendelenburg modificada","Ortopneica"], ans:2, exp:"A posição de Trendelenburg modificada (pernas elevadas, tronco horizontal) favorece o retorno venoso ao coração sem comprometer a respiração." },
+  { cat:"Anatomia", q:"Qual estrutura separa o átrio esquerdo do ventrículo esquerdo?", opts:["Válvula tricúspide","Válvula pulmonar","Válvula mitral","Válvula aórtica"], ans:2, exp:"A válvula mitral (bicúspide) separa o átrio esquerdo do ventrículo esquerdo. A tricúspide separa os câmaras direitas." },
+  { cat:"Farmacologia", q:"A insulina regular tem início de ação de:", opts:["30–60 minutos","5–15 minutos","2–4 horas","10–16 horas"], ans:0, exp:"Insulina regular: início 30-60 min, pico 2-4h, duração 6-10h. Glargina é basal de longa duração (sem pico)." },
+];
+
+const catsList = ["Todas","Farmacologia","Anatomia","Clínica"];
+let activeCat = "Todas", qIdx = 0, score = 0, answered = false, filteredQs = [];
+
+function getFiltered() {
+  return activeCat === "Todas" ? questions : questions.filter(q => q.cat === activeCat);
+}
+
+function renderCats() {
+  document.getElementById("cats").innerHTML = catsList.map(c =>
+    `<button class="cat-btn ${c===activeCat?'active':''}" onclick="setCat('${c}')">${c}</button>`
+  ).join("");
+}
+
+function setCat(c) { activeCat = c; qIdx = 0; score = 0; answered = false; renderCats(); loadQ(); }
+
+function loadQ() {
+  filteredQs = getFiltered();
+  const q = filteredQs[qIdx % filteredQs.length];
+  document.getElementById("qprog").textContent = `Questão ${(qIdx % filteredQs.length)+1} de ${filteredQs.length} • ${q.cat}`;
+  document.getElementById("qtext").textContent = q.q;
+  document.getElementById("qopts").innerHTML = q.opts.map((o,i) =>
+    `<button class="quiz-opt" onclick="answer(${i})">${o}</button>`
+  ).join("");
+  document.getElementById("qfeed").className = "quiz-feedback";
+  document.getElementById("qfeed").textContent = "";
+  document.getElementById("qnext").style.display = "none";
+  answered = false;
+}
+
+function answer(i) {
+  if (answered) return;
+  answered = true;
+  filteredQs = getFiltered();
+  const q = filteredQs[qIdx % filteredQs.length];
+  const btns = document.querySelectorAll(".quiz-opt");
+  btns[q.ans].classList.add("correct");
+  const feed = document.getElementById("qfeed");
+  if (i === q.ans) {
+    score++;
+    feed.className = "quiz-feedback show ok";
+    feed.textContent = "✓ Correto! " + q.exp;
+  } else {
+    btns[i].classList.add("wrong");
+    feed.className = "quiz-feedback show err";
+    feed.textContent = "✗ Incorreto. " + q.exp;
+  }
+  document.getElementById("qscore").textContent = `Pontuação: ${score}/${(qIdx % filteredQs.length)+1}`;
+  document.getElementById("qnext").style.display = "inline-block";
+}
+
+function nextQ() {
+  qIdx++;
+  filteredQs = getFiltered();
+  document.getElementById("qscore").textContent = `Pontuação: ${score}/${Math.min(qIdx, filteredQs.length)}`;
+  loadQ();
+}
+
+renderCats(); loadQ();
+
+// TABS
+function showSection(id, btn) {
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+// CALCULADORAS
+function showCalc(id, btn) {
+  ["dose","gotejo","imc"].forEach(c => document.getElementById("calc-"+c).style.display = c===id?"block":"none");
+  document.querySelectorAll(".calc-tab").forEach(t => t.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+function calcDose() {
+  const mk = parseFloat(document.getElementById("dose_mk").value);
+  const peso = parseFloat(document.getElementById("dose_peso").value);
+  const conc = parseFloat(document.getElementById("dose_conc").value);
+  const el = document.getElementById("dose_res");
+  if (!mk || !peso) { el.innerHTML = "— <span>Preencha os campos acima</span>"; return; }
+  const dose = mk * peso;
+  if (conc) {
+    el.innerHTML = `${dose.toFixed(1)} mg → ${(dose/conc).toFixed(2)} mL <span>Volume a administrar</span>`;
+  } else {
+    el.innerHTML = `${dose.toFixed(1)} mg <span>Dose total calculada</span>`;
+  }
+}
+
+function calcGotejo() {
+  const vol = parseFloat(document.getElementById("got_vol").value);
+  const tempo = parseFloat(document.getElementById("got_tempo").value);
+  const eq = parseInt(document.getElementById("got_eq").value);
+  const el = document.getElementById("got_res");
+  if (!vol || !tempo) { el.innerHTML = "— <span>Preencha os campos acima</span>"; return; }
+  const gts = (vol * eq) / (tempo * 60);
+  el.innerHTML = `${Math.round(gts)} gts/min <span>${(vol/tempo).toFixed(1)} mL/hora</span>`;
+}
+
+function calcIMC() {
+  const peso = parseFloat(document.getElementById("imc_peso").value);
+  const alt = parseFloat(document.getElementById("imc_alt").value);
+  const el = document.getElementById("imc_res");
+  if (!peso || !alt) { el.innerHTML = "— <span>Preencha os campos acima</span>"; return; }
+  const imc = peso / (alt * alt);
+  const cl = imc < 18.5 ? "Abaixo do peso" : imc < 25 ? "Peso normal" : imc < 30 ? "Sobrepeso" : "Obesidade";
+  el.innerHTML = `${imc.toFixed(1)} kg/m² <span>${cl}</span>`;
+}
+
+// PROCEDIMENTOS
+const procs = [
+  { nome:"Verificação de sinais vitais", tags:["basico"], passos:["Higienize as mãos (PVPI ou álcool gel)","Explique o procedimento ao paciente","Meça a PA com braço ao nível do coração, após 5 min de repouso","Apalpe o pulso radial por 60 segundos, avaliando ritmo e amplitude","Conte a frequência respiratória por 60 s sem avisar o paciente","Afira temperatura axilar (36,1–37,2°C normal)","Meça a SpO₂ com oxímetro de pulso no dedo indicador","Registre todos os valores no prontuário"] },
+  { nome:"Passagem de sonda nasogástrica", tags:["tecnico"], passos:["Cheque a prescrição e prepare o material (sonda adequada, xilocaína, luvas)","Posicione o paciente em Fowler alta ou sentado","Meça a distância narina → lóbulo da orelha → apêndice xifóide","Lubrife a sonda com xilocaína gel 2%","Introduza pela narina com movimentos suaves pedindo para engolir","Confirme posicionamento: aspiração de conteúdo gástrico ou RX","Fixe a sonda no nariz com micropore e registre no prontuário"] },
+  { nome:"Administração de medicamento IV", tags:["tecnico"], passos:["Confira os 9 certos (paciente, medicamento, dose, via, hora, tempo, diluição, ação, registro)","Higienize as mãos e prepare o material com técnica asséptica","Calcule dose e diluição conforme prescrito","Realize antissepsia do acesso venoso com álcool 70°","Administre na velocidade prescrita, observando sinais de flebite","Descarte materiais perfurocortantes no descarpak","Registre horário, lote e intercorrências no prontuário"] },
+  { nome:"RCP — suporte básico de vida", tags:["urgente"], passos:["Cheque a responsividade e peça ajuda / acione o SAMU (192)","Posicione o paciente em superfície rígida e plana","Inicie compressões torácicas: 5–6 cm de profundidade, 100–120/min","Ciclo 30:2 (30 compressões + 2 ventilações com máscara)","Minimize interrupções nas compressões (< 10 segundos)","Use o DEA assim que disponível: ligue, siga as instruções de voz","Continue até retorno da circulação espontânea ou chegada do SAMU"] },
+  { nome:"Cateterismo vesical feminino", tags:["tecnico"], passos:["Cheque prescrição, separe material estéril e explique à paciente","Posicione em decúbito dorsal com pernas fletidas (posição ginecológica)","Calce luvas estéreis e realize antissepsia perineal (pubis → vulva)","Identifique o meato uretral com a mão não dominante","Introduza o cateter 4–6 cm com a mão dominante estéril","Insufle o balonete com 5–10 mL de SF após confirmar saída de urina","Conecte ao sistema fechado de drenagem e registre débito urinário"] },
+  { nome:"Curativo simples", tags:["basico"], passos:["Higienize as mãos e use EPI adequado","Remova o curativo anterior com pinça, avalie aspecto da ferida","Limpe a ferida com SF 0,9% em jato suave (seringa 20mL + agulha 40×12)","Avalie presença de infecção (calor, rubor, exsudato purulento, odor)","Aplique cobertura adequada ao tipo e fase de cicatrização","Fixe com esparadrapo ou micropore sem comprimir","Registre aspecto, tamanho e tipo de cobertura no prontuário"] },
+];
+
+function renderProcs(list) {
+  document.getElementById("proclist").innerHTML = list.map((p, i) => `
+    <div class="proc-item">
+      <div class="proc-header" onclick="toggleProc(${i})">
+        <span>${p.nome}</span>
+        <span style="font-size:12px; color:var(--text-sec);">${p.passos.length} etapas <i class="ti ti-chevron-down"></i></span>
+      </div>
+      <div class="proc-body" id="proc-${i}">
+        <div style="margin-bottom:10px;">${p.tags.map(t=>`<span class="proc-tag tag-${t}">${t}</span>`).join("")}</div>
+        ${p.passos.map((s,j)=>`<div class="proc-step"><div class="step-num">${j+1}</div><div>${s}</div></div>`).join("")}
+      </div>
+    </div>`).join("");
+}
+
+function toggleProc(i) {
+  document.getElementById("proc-"+i).classList.toggle("open");
+}
+
+function filterProcs() {
+  const term = document.getElementById("search").value.toLowerCase();
+  renderProcs(procs.filter(p => p.nome.toLowerCase().includes(term)));
+}
+
+renderProcs(procs);
+</script>
+</body>
+</html>
