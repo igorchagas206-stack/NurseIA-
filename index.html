@@ -148,6 +148,8 @@ function load(){
   const div = document.getElementById("qopts");
   div.innerHTML = "";
 
+  document.getElementById("qexp").innerText = "";
+
   q.o.forEach((opt, idx)=>{
     const b = document.createElement("button");
     b.innerText = opt;
@@ -155,8 +157,6 @@ function load(){
     b.onclick = ()=>answer(idx, b);
     div.appendChild(b);
   });
-
-  document.getElementById("qexp").innerText = "";
 }
 
 function answer(idx, btn){
@@ -165,6 +165,12 @@ function answer(idx, btn){
 
   const q = questions[i];
   const buttons = document.querySelectorAll(".quiz-opt");
+
+  // limpa antes de marcar
+  buttons.forEach(b => {
+    b.classList.remove("correct");
+    b.classList.remove("wrong");
+  });
 
   buttons[q.a].classList.add("correct");
 
